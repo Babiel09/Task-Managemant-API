@@ -9,7 +9,7 @@ export class UserController{
     constructor(private userService: UserService) {}
     
     
-    @Post() 
+    @Post("/v1") 
     public async postUser(@Body() userData:CreateUser, @Res() res:Response):Promise<Response>{
         try{
 
@@ -40,7 +40,7 @@ export class UserController{
         };
     };
 
-    @Get()
+    @Get("/v1")
     public async getAllUsers(@Res() res:Response):Promise<Response>{
         try{
             const allUsers = await this.userService.SelectAll();
@@ -56,7 +56,7 @@ export class UserController{
         }
     };
 
-    @Delete("/:id")
+    @Delete("/v1/:id")
     public async deleteUser(@Param("id") id:number, @Res() res:Response):Promise<Response>{
         try{
             if(!id){
@@ -76,7 +76,7 @@ export class UserController{
         }
     };
 
-    @Put("/:id")
+    @Put("/v1/:id")
     public async updateUser(@Param("id") id:number, @Res() res:Response, @Body() data:CreateUser):Promise<Response>{
         try{
             if(!id){
@@ -95,7 +95,7 @@ export class UserController{
         };
     };
 
-    @Get("/:id")
+    @Get("/v1/:id")
     public async getOneUser(@Param("id") id:number, @Res() res:Response):Promise<Response>{
         try{
             if(!id){
@@ -110,6 +110,19 @@ export class UserController{
 
             return res.status(200).send(encontradoUmUser);
 
+        } catch(err){
+            return res.status(500).json({server:`${err}`});
+        };
+    };
+
+    @Get("/v2")
+    public async getUserOnlyTheName(@Res() res:Response):Promise<Response>{
+        try{
+            const usersname = await this.userService.SelectName();
+            if(!usersname){
+                return res.status(500).json({server:`Amazing error! Please try again later!`});
+            };
+            return res.status(200).send(usersname);
         } catch(err){
             return res.status(500).json({server:`${err}`});
         };

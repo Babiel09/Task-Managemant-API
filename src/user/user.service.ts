@@ -1,8 +1,11 @@
 import { Body, Injectable } from "@nestjs/common";
 import { PrismaClient, User } from "@prisma/client";
 
+
+
 const pr = new PrismaClient();
 const prisma = pr.user;
+
 
 interface UserThings{
     id?:number;
@@ -47,6 +50,22 @@ export class UserService{
           {server:`Error during the Insert data to the DB! Error: ${err}`};
            console.error(`Rolou um erro no service do usuário. Erro:${err}`);
            throw new Error(`A error happen when we try to INSERT the user from the DB! Error: ${err}`);
+        };
+    };
+
+    public async SelectName():Promise<{name:string}[]>{
+        try{
+            const encontrarUsersByname = await prisma.findMany({
+                select:{
+                    id:true,
+                    name:true
+                }
+            });
+            return encontrarUsersByname
+        }catch(err) {
+            {server:`Error during the Select By Name operation: ${err.message || err}`};
+            console.error("Erro ao recuperar usuários:", err);
+            throw new Error(`Error during the Select By Name operation: ${err.message || err}`);
         };
     };
 
