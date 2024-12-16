@@ -9,12 +9,16 @@ interface UserThings{
     name?:string;
     email?:string;
     password?:string;
+    data?:{
+        [key:string]:any
+    }
+        
 }
 
 
 @Injectable()
 export class UserService{
-    async Insert(@Body() userData):Promise<User>{
+    public async Insert(@Body() userData):Promise<User>{
         try{
             const postNewUser = await prisma.create({
                 data:userData
@@ -28,7 +32,7 @@ export class UserService{
         };
     };
 
-    async SelectAll():Promise<User[]> {
+    public async SelectAll():Promise<User[]> {
         try{
 
             const mostraTudo = await prisma.findMany();
@@ -38,13 +42,42 @@ export class UserService{
             console.error("Erro ao recuperar usuários:", err);
             throw new Error(`Error during the SelectAll operation: ${err.message || err}`);
         };
-    }
+    };
 
-    async Delete({id}:UserThings):Promise<User>{
+    public async SelectOne({id}:UserThings):Promise<User>{
         try{
+            const encontraPeloId = await prisma.findFirst({
+                where:{
+                    id:Number(id)
+                }
+            });
+            if (!encontraPeloId){
+                console.error("We can't find the user id!");
+                return null
+            };
+            return encontraPeloId;
+        } catch(err){
+            
+        };
+    };
+
+    public async Delete({id}:UserThings):Promise<User>{
+        try{
+
+            const procurarId = await prisma.findFirst({
+                where:{
+                    id:Number(id)
+                }
+            });
+
+            if(!procurarId){
+                console.error(`Rolou um erro no service do usuário!`);
+                throw new Error(`we can't find this ID!`);
+            };
+
             const deletando = await prisma.delete({
                 where:{
-                    id:id
+                    id:procurarId.id
                 }
             });
 
@@ -57,8 +90,43 @@ export class UserService{
             return deletando;
         } catch(err){
             {server:`A error happen when we try to Delete the user from the DB! Error: ${err}`};
-            console.error(`Rolou um erro no service do usuário!`);
+            console.error(`Rolou um erro no service do usuário. Erro: ${err}`);
             throw new Error(`A error happen when we try to Delete the user from the DB! Error: ${err}`);
         };
     };
+
+    public async Update({id,data}:UserThings):Promise<User>{
+        try{
+            const procurarId = await prisma.findFirst({
+                where:{
+                    id:Number(id)
+                }
+            });
+
+            if(!procurarId){
+                console.error(`Rolou um erro no service do usuário!`);
+                throw new Error(`we can't find this ID!`);
+            };
+
+            const tentarAtualizar = await prisma.update({
+                where:{
+                    id:procurarId.id
+                },
+                data:data
+            });
+
+            if(!tentarAtualizar){
+                console.error(`Rolou um erro no service do usuário!`);
+                throw new Error(`Amazing error, check your internet please and try again!`);
+            }
+
+            return tentarAtualizar;
+
+        } catch(err){
+            {server:`A error happen when we try to UPDATE the user from the DB! Error: ${err}`};
+            console.error(`Rolou um erro no service do usuário!`);
+            throw new Error(`A error happen when we try to UPDATE the user from the DB! Error: ${err}`);
+        };
+    };
+
 };

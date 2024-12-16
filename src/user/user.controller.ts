@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Req, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Req, Res } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Response } from "express";
 
@@ -9,7 +9,7 @@ export class UserController{
     
     
     @Post() 
-    async postUser(@Body() userData:{name:string,email:string, password:string}, @Res() res:Response){
+    public async postUser(@Body() userData:{name:string,email:string, password:string}, @Res() res:Response):Promise<Response>{
         try{
 
             const username:string = userData.name;
@@ -31,7 +31,7 @@ export class UserController{
             const newUser = await this.userService.Insert(userData);
             
             if(!newUser){
-                throw new HttpException ("Unxpected error during the POST method! We can't show to you the userData!", HttpStatus.BAD_REQUEST);
+                return res.status(500).json({server:"Unxpected error during the POST method! We can't show to you the userData!"});
             };
             return res.status(HttpStatus.CREATED).send(newUser);
         } catch(err){
@@ -40,7 +40,7 @@ export class UserController{
     };
 
     @Get()
-    async getAllUsers(@Res() res:Response){
+    public async getAllUsers(@Res() res:Response):Promise<Response>{
         try{
             const allUsers = await this.userService.SelectAll();
             
@@ -56,10 +56,10 @@ export class UserController{
     };
 
     @Delete("/:id")
-    async deleteUser(@Param("id") id:number, @Res() res:Response){
+    public async deleteUser(@Param("id") id:number, @Res() res:Response):Promise<Response>{
         try{
             if(!id){
-                throw new HttpException ("You need to pass the user ID!", HttpStatus.BAD_REQUEST);
+                return res.status(500).json({server:"You can't find this id!"});
             };
 
             const userDeletado = await this.userService.Delete({id});
@@ -73,5 +73,44 @@ export class UserController{
         } catch(err){
             return res.status(500).json({server:`${err}`});
         }
+    };
+
+    @Put("/:id")
+    public async updateUser(@Param("id") id:number, @Res() res:Response, @Body() data:{name:string, email:string, password:string}):Promise<Response>{
+        try{
+            if(!id){
+                return res.status(500).json({server:"You can't find this id!"});
+            };
+
+            const userAtualizado = await this.userService.Update({id,data});
+            if(!userAtualizado){
+                return res.status(500).json({server:"Amazin error in the PUT method, please try your wi fi connection and try again later!"});
+            };
+
+            return res.status(202).send(userAtualizado);
+
+        }catch(err){
+            return res.status(500).json({server:`${err}`});
+        };
+    };
+
+    @Get("/:id")
+    public async getOneUser(@Param("id") id:number, @Res() res:Response):Promise<Response>{
+        try{
+            if(!id){
+                return res.status(500).json({server:"You can't find this id!"});
+            };
+
+            const encontradoUmUser = await this.userService.SelectOne({id});
+
+            if(!encontradoUmUser){
+                return res.status(500).json({server:"We can't show to you the specified user, please try again later!"});
+            };
+
+            return res.status(200).send(encontradoUmUser);
+
+        } catch(err){
+
+        };
     };
 };
