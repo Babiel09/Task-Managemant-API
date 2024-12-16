@@ -18,16 +18,31 @@ interface UserThings{
 
 @Injectable()
 export class UserService{
-    public async Insert(@Body() userData):Promise<User>{
+    public async Insert({name,email,password}:UserThings):Promise<User>{
         try{
-            const postNewUser = await prisma.create({
-                data:userData
+
+            const verificandoEmail = await prisma.findUnique({
+                where:{
+                    email:email
+                }
             });
-            console.log("A requisição para dar o Insert dentro do DB deu certo!");
+
+            if(verificandoEmail){
+                console.error("Email already exists!");
+                throw new Error("Email already exists!");
+            };
+
+            const postNewUser = await prisma.create({
+                data:{
+                    name:name,
+                    email:email,
+                    password:password,
+                }
+            });
             return postNewUser;
         } catch(err){
           {server:`Error during the Insert data to the DB! Error: ${err}`};
-           console.error(`Rolou um erro no service do usuário!`);
+           console.error(`Rolou um erro no service do usuário. Erro:${err}`);
            throw new Error(`A error happen when we try to Delete the user from the DB! Error: ${err}`);
         };
     };
