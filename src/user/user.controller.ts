@@ -1,16 +1,17 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Req, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Req, Res, UnauthorizedException } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Response } from "express";
 import CreateUser from "./DTO/usercreation.dto";
+import AuthService from "./auth/user.auth";
 
 @Controller("/user")
 export class UserController{
     
-    constructor(private userService: UserService) {}
+    constructor(private userService: UserService, private authService:AuthService) {}
     
     
     @Post("/v1") 
-    public async postUser(@Body() userData:CreateUser, @Res() res:Response):Promise<Response>{
+    private async postUser(@Body() userData:CreateUser, @Res() res:Response):Promise<Response>{
         try{
 
             const username:string = userData.name;
@@ -28,6 +29,10 @@ export class UserController{
             if(!userPass){
                 return res.status(400).json({server:"You need to pass the user PASSWORD!"});
             };
+
+            const passwordToken = await this.authService.createToke(userPass);
+
+                userData.password = passwordToken;
             
             const newUser = await this.userService.Insert(userData);
             
@@ -41,7 +46,7 @@ export class UserController{
     };
 
     @Get("/v1")
-    public async getAllUsers(@Res() res:Response):Promise<Response>{
+    private async getAllUsers(@Res() res:Response):Promise<Response>{
         try{
             const allUsers = await this.userService.SelectAll();
             
@@ -57,7 +62,7 @@ export class UserController{
     };
 
     @Delete("/v1/:id")
-    public async deleteUser(@Param("id") id:number, @Res() res:Response):Promise<Response>{
+    private async deleteUser(@Param("id") id:number, @Res() res:Response):Promise<Response>{
         try{
             if(!id){
                 return res.status(500).json({server:"You can't find this id!"});
@@ -77,7 +82,7 @@ export class UserController{
     };
 
     @Put("/v1/:id")
-    public async updateUser(@Param("id") id:number, @Res() res:Response, @Body() data:CreateUser):Promise<Response>{
+    private async updateUser(@Param("id") id:number, @Res() res:Response, @Body() data:CreateUser):Promise<Response>{
         try{
             if(!id){
                 return res.status(500).json({server:"You can't find this id!"});
@@ -96,7 +101,7 @@ export class UserController{
     };
 
     @Get("/v1/:id")
-    public async getOneUser(@Param("id") id:number, @Res() res:Response):Promise<Response>{
+    private async getOneUser(@Param("id") id:number, @Res() res:Response):Promise<Response>{
         try{
             if(!id){
                 return res.status(500).json({server:"You can't find this id!"});
@@ -115,8 +120,24 @@ export class UserController{
         };
     };
 
+   // @Post("/v1/login")
+//
+   // private async testOfLoginAboutJWT(@Body() data:{name:string, password:string}, @Res() res:Response):Promise<Response>{
+   //     try{
+   //         if(data.name === process.env.USER_NAME && data.password === process.env.USER_PASSWORD){
+   //         const id = parseInt(process.env.USER_ID);
+   //         const token = await this.authService.createToke(data.password);
+   //         return res.status(202).json({auth:true, token:token});
+   //         };
+   //         return res.status(401).json({server:"You do not have permission to be here!", auth:false, token:null });
+   //     } catch(err){
+   //         throw new UnauthorizedException();
+   //     };
+   // };
+
+
     @Get("/v2")
-    public async getUserOnlyTheName(@Res() res:Response):Promise<Response>{
+    private async getUserOnlyTheName(@Res() res:Response):Promise<Response>{
         try{
             const usersname = await this.userService.SelectName();
             if(!usersname){
@@ -126,5 +147,6 @@ export class UserController{
         } catch(err){
             return res.status(500).json({server:`${err}`});
         };
+
     };
 };

@@ -53,7 +53,7 @@ export class UserService{
         };
     };
 
-    public async SelectName():Promise<{name:string}[]>{
+    public async SelectName():Promise<{id:number,name:string}[]>{
         try{
             const encontrarUsersByname = await prisma.findMany({
                 select:{
