@@ -39,11 +39,14 @@ export class UserService{
                     password:password,
                 }
             });
+
+            console.log("Novo email cadastrado!");
+
             return postNewUser;
         } catch(err){
           {server:`Error during the Insert data to the DB! Error: ${err}`};
            console.error(`Rolou um erro no service do usuário. Erro:${err}`);
-           throw new Error(`A error happen when we try to Delete the user from the DB! Error: ${err}`);
+           throw new Error(`A error happen when we try to INSERT the user from the DB! Error: ${err}`);
         };
     };
 

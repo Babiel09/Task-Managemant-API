@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Req, Res } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Response } from "express";
+import CreateUser from "./DTO/usercreation.dto";
 
 @Controller("/user")
 export class UserController{
@@ -9,7 +10,7 @@ export class UserController{
     
     
     @Post() 
-    public async postUser(@Body() userData:{name:string,email:string, password:string}, @Res() res:Response):Promise<Response>{
+    public async postUser(@Body() userData:CreateUser, @Res() res:Response):Promise<Response>{
         try{
 
             const username:string = userData.name;
@@ -76,7 +77,7 @@ export class UserController{
     };
 
     @Put("/:id")
-    public async updateUser(@Param("id") id:number, @Res() res:Response, @Body() data:{name:string, email:string, password:string}):Promise<Response>{
+    public async updateUser(@Param("id") id:number, @Res() res:Response, @Body() data:CreateUser):Promise<Response>{
         try{
             if(!id){
                 return res.status(500).json({server:"You can't find this id!"});
