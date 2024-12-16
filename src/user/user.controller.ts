@@ -110,7 +110,7 @@ export class UserController{
             return res.status(200).send(encontradoUmUser);
 
         } catch(err){
-
+            return res.status(500).json({server:`${err}`});
         };
     };
 };
