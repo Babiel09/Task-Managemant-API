@@ -1,10 +1,11 @@
-import { Body, Injectable } from "@nestjs/common";
-import { PrismaClient, User } from "@prisma/client";
+import { Injectable } from "@nestjs/common";
+import { Prisma, User } from "@prisma/client";
+import { DefaultArgs } from "@prisma/client/runtime/library";
+import { PrismaService } from "prisma/prisma.service";
 
 
 
-const pr = new PrismaClient();
-const prisma = pr.user;
+
 
 
 interface UserThings{
@@ -21,10 +22,16 @@ interface UserThings{
 
 @Injectable()
 export class UserService{
+    private readonly prisma:Prisma.UserDelegate<DefaultArgs>;
+
+    constructor(private readonly pr:PrismaService){
+        this.prisma = pr.user
+    };
+
     public async Insert({name,email,password}:UserThings):Promise<User>{
         try{
 
-            const verificandoEmail = await prisma.findUnique({
+            const verificandoEmail = await this.prisma.findUnique({
                 where:{
                     email:email
                 }
@@ -35,7 +42,7 @@ export class UserService{
                 throw new Error("Email already exists!");
             };
 
-            const postNewUser = await prisma.create({
+            const postNewUser = await this.prisma.create({
                 data:{
                     name:name,
                     email:email,
@@ -53,9 +60,11 @@ export class UserService{
         };
     };
 
+
+
     public async SelectName():Promise<{id:number,name:string}[]>{
         try{
-            const encontrarUsersByname = await prisma.findMany({
+            const encontrarUsersByname = await this.prisma.findMany({
                 select:{
                     id:true,
                     name:true
@@ -72,7 +81,7 @@ export class UserService{
     public async SelectAll():Promise<User[]> {
         try{
 
-            const mostraTudo = await prisma.findMany();
+            const mostraTudo = await this.prisma.findMany();
             return mostraTudo;
         } catch(err) {
             {server:`Error during the SelectAll operation: ${err.message || err}`};
@@ -83,7 +92,7 @@ export class UserService{
 
     public async SelectOne({id}:UserThings):Promise<User>{
         try{
-            const encontraPeloId = await prisma.findFirst({
+            const encontraPeloId = await this.prisma.findFirst({
                 where:{
                     id:Number(id)
                 }
@@ -101,7 +110,7 @@ export class UserService{
     public async Delete({id}:UserThings):Promise<User>{
         try{
 
-            const procurarId = await prisma.findFirst({
+            const procurarId = await this.prisma.findFirst({
                 where:{
                     id:Number(id)
                 }
@@ -112,7 +121,7 @@ export class UserService{
                 throw new Error(`we can't find this ID!`);
             };
 
-            const deletando = await prisma.delete({
+            const deletando = await this.prisma.delete({
                 where:{
                     id:procurarId.id
                 }
@@ -134,7 +143,7 @@ export class UserService{
 
     public async Update({id,data}:UserThings):Promise<User>{
         try{
-            const procurarId = await prisma.findFirst({
+            const procurarId = await this.prisma.findFirst({
                 where:{
                     id:Number(id)
                 }
@@ -145,7 +154,7 @@ export class UserService{
                 throw new Error(`we can't find this ID!`);
             };
 
-            const tentarAtualizar = await prisma.update({
+            const tentarAtualizar = await this.prisma.update({
                 where:{
                     id:procurarId.id
                 },

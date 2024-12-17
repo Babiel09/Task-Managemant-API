@@ -1,13 +1,13 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Req, Res, UnauthorizedException } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { Response } from "express";
-import CreateUser from "./DTO/usercreation.dto";
+import {CreateUser} from "./DTO/usercreation.dto";
 import AuthService from "./auth/user.auth";
 
 @Controller("/user")
 export class UserController{
     
-    constructor(private userService: UserService, private authService:AuthService) {}
+    constructor(private readonly userService: UserService, private readonly authService:AuthService) {};
     
     
     @Post("/v1") 
@@ -30,7 +30,7 @@ export class UserController{
                 return res.status(400).json({server:"You need to pass the user PASSWORD!"});
             };
 
-            const passwordToken = await this.authService.createToke(userPass);
+            const passwordToken = await this.authService.createToken(userPass);
 
                 userData.password = passwordToken;
             
@@ -82,12 +82,13 @@ export class UserController{
     };
 
     @Put("/v1/:id")
-    private async updateUser(@Param("id") id:number, @Res() res:Response, @Body() data:CreateUser):Promise<Response>{
+    private async updateUser(@Param("id") id:number, @Res() res:Response, @Body() data:{name:string, email:string,password:string}):Promise<Response>{
         try{
             if(!id){
                 return res.status(500).json({server:"You can't find this id!"});
             };
-
+            const jwtPassword = await this.authService.createToken(data.password);
+            data.password = jwtPassword;
             const userAtualizado = await this.userService.Update({id,data});
             if(!userAtualizado){
                 return res.status(500).json({server:"Amazin error in the PUT method, please try your wi fi connection and try again later!"});
