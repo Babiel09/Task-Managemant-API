@@ -48,9 +48,8 @@ Make sure you configure the necessary environment variables for your JWT secret 
 <li>
 Run the application:
  </li>
-
-    npm run start
 </ul>
+    npm run start
 
 Now your API is up and running! 🚀
 ## 📜 Endpoints
@@ -58,7 +57,7 @@ Now your API is up and running! 🚀
     POST /user/v1 = Create a new user.
     GET /user/v1 = Get all users.
     GET /user/v1/:id = Get a specific user by ID.
-    GET /user/v1/:id = Get all users only showing the name.
+    GET /user/v2 = Get all users only showing the name.
     PUT /user/v1/:id = Update a user by ID.
     DELETE /user/v1/:id = Delete a user by ID.
 
