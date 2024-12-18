@@ -42,13 +42,15 @@ Navigate to the project directory:
 <li>
 Set up your environment variables:
  </li>
-</ul>
-
-    Make sure you configure the necessary environment variables for your JWT secret and other sensitive data.
-
+<li>
+Make sure you configure the necessary environment variables for your JWT secret and other sensitive data.
+ </li>
+<li>
 Run the application:
+ </li>
 
     npm run start
+</ul>
 
 Now your API is up and running! 🚀
 ## 📜 Endpoints
