@@ -3,11 +3,12 @@ import { UserService } from "./user.service";
 import { Response } from "express";
 import {CreateUser} from "./DTO/usercreation.dto";
 import AuthService from "./auth/user.auth";
+import { CpfValidator } from "src/cpf/cpf.service";
 
 @Controller("/user")
 export class UserController{
     
-    constructor(private readonly userService: UserService, private readonly authService:AuthService) {};
+    constructor(private readonly userService: UserService, private readonly authService:AuthService, private readonly cpfvalidator:CpfValidator) {};
     
     
     @Post("/v1") 
@@ -16,10 +17,14 @@ export class UserController{
 
             const username:string = userData.name;
             const userEmail:string = userData.email;
+            const userCPF:string[] = userData.cpf;
             const userPass:string = userData.password;
 
             if(!username){
                 return res.status(400).json({server:"You need to pass the user NAME!"});
+            };
+            if(!userCPF){
+                return res.status(400).json({server:"You need to pass the user CPF!"});
             };
 
             if(!userEmail){
@@ -33,6 +38,14 @@ export class UserController{
             const passwordToken = await this.authService.createToken(userPass);
 
                 userData.password = passwordToken;
+
+            const verificaCPf = this.cpfvalidator.verify(userData.cpf);
+
+            if(verificaCPf === false){
+                console.error(`Error to verify the copf here!`);
+                return res.status(401).json({server:"Please send to me a valid CPF!"});
+            }
+
             
             const newUser = await this.userService.Insert(userData);
             
@@ -82,7 +95,7 @@ export class UserController{
     };
 
     @Put("/v1/:id")
-    private async updateUser(@Param("id") id:number, @Res() res:Response, @Body() data:{name:string, email:string,password:string}):Promise<Response>{
+    private async updateUser(@Param("id") id:number, @Res() res:Response, @Body() data:{name:string, email:string,password:string, cpf:string}):Promise<Response>{
         try{
             if(!id){
                 return res.status(500).json({server:"You can't find this id!"});

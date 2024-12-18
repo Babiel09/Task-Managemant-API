@@ -13,6 +13,7 @@ interface UserThings{
     name?:string;
     email?:string;
     password?:string;
+    cpf?:string[];
     data?:{
         [key:string]:any
     }
@@ -28,7 +29,7 @@ export class UserService{
         this.prisma = pr.user
     };
 
-    public async Insert({name,email,password}:UserThings):Promise<User>{
+    public async Insert({name,email,password,cpf}:UserThings):Promise<User>{
         try{
 
             const verificandoEmail = await this.prisma.findUnique({
@@ -47,6 +48,7 @@ export class UserService{
                     name:name,
                     email:email,
                     password:password,
+                    cpf:cpf,
                 }
             });
 

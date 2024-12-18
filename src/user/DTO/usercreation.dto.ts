@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength } from "class-validator";
+import { ArrayNotEmpty, IsArray, IsEmail, IsString, MaxLength, MinLength } from "class-validator";
 
 export abstract class CreateUser{
 
@@ -8,6 +8,11 @@ export abstract class CreateUser{
 
     @IsEmail(undefined, {message:"Pass one email to continue!"})
     email:string;
+
+    @IsArray()
+    @ArrayNotEmpty()
+    @IsString({each:true})
+    cpf:string[];
     
     @IsString({message:"The password needs to be a string!"})
     @MinLength(8, {message:"The password needs to have the length more then 8!"})

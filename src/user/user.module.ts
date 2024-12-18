@@ -5,10 +5,13 @@ import { ConfigModule } from "@nestjs/config";
 import { JwtModule } from '@nestjs/jwt';
 import  AuthService  from './auth/user.auth';
 import { PrismaService } from "../../prisma/prisma.service";
+import { CpfModule } from "src/cpf/cpf.module";
+import { CpfValidator } from "src/cpf/cpf.service";
 
 @Module({
     imports: [
         UserModule,
+        CpfModule,
         ConfigModule.forRoot(),
         JwtModule.register({
           secret:process.env.JWT_SECRET,
@@ -18,7 +21,7 @@ import { PrismaService } from "../../prisma/prisma.service";
         }),
       ],
     controllers:[UserController],
-    providers:[UserService,AuthService,PrismaService],
+    providers:[UserService,AuthService,PrismaService, CpfValidator],
 })
 
 export class UserModule{};
