@@ -20,17 +20,17 @@ This API is built using Nest.js, a powerful, extensible framework for building e
 
 To get started with the Task Management API, follow these simple steps:
 
-    Clone this repository:
+Clone this repository:
 
-git clone https://github.com/Babiel09/Task-Managemant-API
-
-Navigate to the project directory:
-
-cd task-management-api
-
-Install the dependencies:
-
-npm install
+    git clone https://github.com/Babiel09/Task-Managemant-API
+    
+    Navigate to the project directory:
+    
+    cd task-management-api
+    
+    Install the dependencies:
+    
+    npm install
 
 Set up your environment variables:
 
